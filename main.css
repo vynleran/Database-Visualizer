@@ -1,0 +1,79 @@
+/* Code for the whole website */
+
+:root {
+    --main-text-color: #56c9aa;
+    --main-bg-color: #14171d;
+}
+  
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+  
+html {
+    scroll-behavior: smooth;
+}
+
+#body{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    height: 100%;
+}
+
+#inputs{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 25%;
+}
+
+#form{
+    display: flex;
+    flex-direction: row;
+}
+
+#label{
+    display: flex;
+    flex-direction: column;
+}
+
+#info{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+#submit{
+    width: 100%;
+}
+
+#graph{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 75%;
+}
+
+#chart{
+    width: 100%; 
+    height: 100%; 
+    background: #14171d; 
+    border: 3px solid #56c9aa;
+    color: white;
+    margin-top: 10px;
+}
+
+#graphButton{
+    width: 100%;
+    height: 10px;
+    text-decoration: none;
+    color: black;
+}
+
+#graphButton:visited { 
+    text-decoration: none; 
+    color: black; 
+   }
