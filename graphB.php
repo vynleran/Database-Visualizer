@@ -15,6 +15,7 @@ include 'dbConn.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="http://code.jquery.com/jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
     <script type="text/javascript" src="graph.js"></script>
     <title>Document</title>
@@ -50,15 +51,15 @@ include 'dbConn.php';
                         oninput="setCustomValidity('')" name="cycle">
 
                         <select name="X">
-                            <option value="cap">Capacity</option>
-                            <option value="speCap">Specific Capacity</option>
-                            <option value="voltage">Voltage</option>
+                            <option value="Capacity">Capacity</option>
+                            <option value="SpeCapacity">Specific Capacity</option>
+                            <option value="Voltage">Voltage</option>
                         </select>
 
                         <select name="Y">
-                            <option value="cap">Capacity</option>
-                            <option value="speCap">Specific Capacity</option>
-                            <option value="voltage">Voltage</option>
+                            <option value="Capacity">Capacity</option>
+                            <option value="SpeCapacity">Specific Capacity</option>
+                            <option value="Voltage">Voltage</option>
                         </select>
 
                         <input type="checkbox" name="discharge">
@@ -69,28 +70,70 @@ include 'dbConn.php';
                 <div>
                     <button type="submit" name="submit">Submit</button>
                 </div>
+                <!-- Upload File Button -->
+                <div>
+                    <input type="file" name="file">
+                    <input type="submit">
+                </div>
             </form>
+            <p id="demo"></p>
         </div>
         <div id="graph">
+        <?php
+            $json = json_encode ($xArray, JSON_FORCE_OBJECT );
+        ?>
             <script>
-                var graph = document.getElementById('graph');
+                var json_obj = jQuery.parseJSON ( ' + <?php echo $json; ?> + ' );
+                var data = [];
+                var xAxis = [];
+                var yAxis = [];
+                $(document).ready(function(){
+                    $.ajax({
+                        url: "http://localhost/graphB.php",
+                        method: "POST",
+                        success: function(xArray) {
+                            console.log(xArray);
 
-                var charge0 = {
-                    x: [<?php echo $dataX; ?>],
-                    y: [<?php echo $dataY; ?>]
-                };
-                var discharge0 = {
-                    x: [<?php echo $dataX2; ?>],
-                    y: [<?php echo $dataY2; ?>]
-                };
-                var charge1 = {
-                    x: [<?php echo $dataX1; ?>],
-                    y: [<?php echo $dataY1; ?>]
-                };
-                var discharge1 = {
-                    x: [<?php echo $dataX3; ?>],
-                    y: [<?php echo $dataY3; ?>]
-                };
+                            for(var i in xArray){
+                                xAxis.push(xArray[i]);
+                            }
+                        },
+                        error: function(xArray){
+                            console.log(xArray);
+                        }
+                    });
+                });
+
+                $(document).ready(function(){
+                    $.ajax({
+                        url: "http://localhost/graphB.php",
+                        method: "POST",
+                        success: function(yArray) {
+                            console.log(yArray);
+
+                            for(var i in yArray){
+                                yAxis.push(yArray[i]);
+                            }
+                        },
+                        error: function(yArray){
+                            console.log(yArray);
+                        }
+                    });
+                });
+                
+                for(i=0;i<data.length;i++){
+                    for(j=0;j<xAxis.length;j++){
+                        for(k=0;k<yAxis.length;k++){
+                            data[i].push({
+                                x: xAxis[j],
+                                y: yAxis[k]
+                            });
+                        }
+                    }
+                }
+
+                //var body = document.getElementById('body');
+                var graph = document.getElementById('graph');
                 
                 var layout = {
                     title: {
@@ -124,68 +167,9 @@ include 'dbConn.php';
                     }
                     };
 
-                var data = [charge0, discharge0, charge1. discharge1];
                 Plotly.newPlot(graph, data, layout);
-                                // [
-                                //     {
-                                //         x: [<?php echo $dataX; ?>],
-                                //         y: [<?php echo $dataY; ?>] 
-                                //     }
-                                // ], 
-                                // {
-                                //     margin: {t: 0} 
-                                // }
-                            
             </script>
         </div>
-        <!-- The graph half -->
-        <!-- <div id="graph">
-            <canvas id="chart"></canvas>
-            <script>var ctx = document.getElementById("chart").getContext('2d');
-                    var myChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: [<?php echo $dataX; ?>],
-                            // [<?php echo $dataX; ?>]
-                            datasets: 
-                            [{
-                                label: 'cycle(charge) ' + [<?php echo $cycleArray[0]; ?>],
-                                data: [<?php echo $dataY; ?>],
-                                backgroundColor: 'transparent',
-                                borderColor:'green',
-                                borderWidth: 1,
-                            },
-                            {
-                                label: 'cycle(discharge) ' + [<?php echo $cycleArray[0]; ?>],
-                                data: [<?php echo $dataY2; ?>],
-                                backgroundColor: 'transparent',
-                                borderColor:'green',
-                                borderWidth: 1,
-                            },
-                            {
-                                label: 'cycle(charge) ' + [<?php echo $cycleArray[1]; ?>],
-                                data: [<?php echo $dataY1; ?>],
-                                backgroundColor: 'transparent',
-                                borderColor:'red',
-                                borderWidth: 1,
-                            },
-                            {
-                                label: 'cycle(discharge) ' + [<?php echo $cycleArray[1]; ?>],
-                                data: [<?php echo $dataY3; ?>],
-                                backgroundColor: 'transparent',
-                                borderColor:'red',
-                                borderWidth: 1,
-                            }]
-                        },
-                        
-                        options: {
-                            scales: {scales:{yAxes: [{beginAtZero: false}], xAxes: [{autoskip: true, maxTicketsLimit: 20}]}},
-                            tooltips:{mode: 'index'},
-                            legend:{display: true, position: 'top', labels: {fontColor: 'rgb(255,255,255)', fontSize: 16}}
-                        }
-                    });
-            </script>
-        </div> -->
     </div>
 </body>
 </html>

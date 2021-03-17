@@ -17,6 +17,8 @@ include 'dbConn.php';
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
     <script type="text/javascript" src="graph.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>Document</title>
 </head>
 <body>
@@ -68,11 +70,17 @@ include 'dbConn.php';
                             <option value="Voltage">Voltage</option>
                             <option value="Efficiency">Efficiency</option>
                         </select>
+
                     </div>
                 </div>
                 <!-- Submit Button -->
                 <div>
                     <button type="submit" name="submit">Submit</button>
+                </div>
+                <!-- Upload File Button -->
+                <div>
+                    <input type="file" name="file">
+                    <input type="submit">
                 </div>
             </form>
         </div>
@@ -105,7 +113,7 @@ include 'dbConn.php';
                 
                 var layout = {
                     title: {
-                        text:'data from cycles under ' + '<?php echo $cycle; ?>',
+                        text:'Data from cycles under ' + '<?php echo $cycle; ?>' + ' from battery #' + '<?php echo $battery?>',
                         font: {
                             family: 'Courier New, monospace',
                             size: 24
@@ -147,63 +155,31 @@ include 'dbConn.php';
                     }
                 };
 
-                var data = [trace, trace1];
+                var data = [{
+                                x: [<?php echo $dataX; ?>],
+                                y: [<?php echo $dataY; ?>], 
+                                name : '<?php echo $yVar; ?>',
+                                type: 'scatter',
+                                line: {
+                                    color: 'red',
+                                    width: 2
+                                }
+                            },
+
+                            {
+                                x: [<?php echo $dataX; ?>], // the issue is coming from here since its just over laying both of them on top of each other
+                                y: [<?php echo $dataY2; ?>],
+                                name : '<?php echo $y2Var; ?>',
+                                type: 'scatter',
+                                yaxis: 'y2',
+                                line: {
+                                    color: 'black',
+                                    width: 2
+                                }
+                            }];
                 Plotly.newPlot(graph, data, layout);
-                                // [
-                                //     {
-                                //         x: [<?php echo $dataX; ?>],
-                                //         y: [<?php echo $dataY; ?>] 
-                                //     }
-                                // ], 
-                                // {
-                                //     margin: {t: 0} 
-                                // }
-                            
             </script>
         </div>
-        <!-- The graph half -->
-        <!-- <div id="graph">
-            <canvas id="chart"></canvas>
-            <script>var ctx = document.getElementById("chart").getContext('2d');
-                    var myChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: [<?php echo $dataX; ?>],
-                            datasets: 
-                            [{
-                                label: 'data from cycles under ' + [<?php echo $cycle; ?>],
-                                data: [<?php echo $dataY; ?>],
-                                backgroundColor: 'transparent',
-                                borderColor:'green',
-                                borderWidth: 3,
-                            }]
-                        },
-                        
-                        // options : {
-                        //     scales: {
-                        //         yAxes: [{
-                        //         scaleLabel: {
-                        //             display: true,
-                        //             labelString: [<?php echo $yVar; ?>]
-                        //         }
-                        //         }],
-                        //         xAxes: [{
-                        //         scaleLabel: {
-                        //             display: true,
-                        //             labelString: [<?php echo $xVar; ?>]
-                        //         }
-                        //         }]
-                        //     }
-                        //     }
-                        // });
-                        options: {
-                            scales: {scales:{yAxes: [{beginAtZero: false}], xAxes: [{autoskip: true, maxTicketsLimit: 20}]}},
-                            tooltips:{mode: 'index'},
-                            legend:{display: true, position: 'top', labels: {fontColor: 'rgb(255,255,255)', fontSize: 16}}
-                        }
-                    });
-            </script>
-        </div> -->
     </div>
 </body>
 </html>
