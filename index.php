@@ -29,7 +29,7 @@ include 'dbConn.php';
         <div id="inputs">
             <!-- The input form -->
             <form action="index.php" method="POST">
-            <button><a href="graphB.php" id="graphButton">graphB</a></button>
+                <button><a href="graphB.php" id="graphButton">graphB</a></button>
                 <div id="form">
                     <!-- Labels -->
                     <div id="label">
@@ -77,10 +77,12 @@ include 'dbConn.php';
                 <div>
                     <button type="submit" name="submit">Submit</button>
                 </div>
-                <!-- Upload File Button -->
+            </form>
+            <!-- Upload File Button -->
+            <form action="DBCycle.php" method="POST" enctype="multipart/form-data">
                 <div>
-                    <input type="file" name="file">
-                    <input type="submit">
+                    <input type="file" name="file" id="file">
+                    <input type="submit" value="Upload" name="submit">
                 </div>
             </form>
         </div>
