@@ -15,11 +15,7 @@ include 'dbConn.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
-    <script type="text/javascript" src="graph.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <title>Document</title>
+    <title>Cycle Life</title>
 </head>
 <body>
     <?php include "formA.php" ?>
@@ -29,15 +25,15 @@ include 'dbConn.php';
         <div id="inputs">
             <!-- The input form -->
             <form action="index.php" method="POST">
-                <button><a href="graphB.php" id="graphButton">graphB</a></button>
+                <button><a href="graphB.php" id="graphButton">Voltage Profile</a></button>
                 <div id="form">
                     <!-- Labels -->
                     <div id="label">
-                        <label for="">Which Batteries?</label>
-                        <label for="">What Cycles?</label>
-                        <label for="">What's X?</label>
-                        <label for="">What's Y1?</label>
-                        <label for="">What's Y2?</label>
+                        <label for="">Battery:</label>
+                        <!-- <label for="">What Cycles?</label> -->
+                        <!-- <label for="">What's X?</label> -->
+                        <label for="">Y1:</label>
+                        <label for="">Y2:</label>
                     </div>
                     <!-- User Info -->
                     <div id="info">
@@ -46,28 +42,28 @@ include 'dbConn.php';
                         oninvalid="this.setCustomValidity('No Batteries Were Entered')"
                         oninput="setCustomValidity('')" name="battery">
 
-                        <input type="text" placeholder="Cycles" required 
+                        <!-- <input type="text" placeholder="Cycles" required 
                         oninvalid="this.setCustomValidity('No Cycles Were Entered')"
-                        oninput="setCustomValidity('')" name="cycle">
+                        oninput="setCustomValidity('')" name="cycle"> -->
 
-                        <select name="X">
+                        <!-- <select name="X">
                             <option value="Capacity">Capacity</option>
                             <option value="SpeCapacity">Specific Capacity</option>
                             <option value="Voltage">Voltage</option>
                             <option value="CycleID">Cycle ID</option>
-                        </select>
+                        </select> -->
 
                         <select name="Y">
                             <option value="Capacity">Capacity</option>
                             <option value="SpeCapacity">Specific Capacity</option>
-                            <option value="Voltage">Voltage</option>
-                            <option value="Efficiency">Efficiency</option>
+                            <!-- <option value="Voltage">Voltage</option>
+                            <option value="Efficiency">Efficiency</option> -->
                         </select>
 
                         <select name="Y1">
                             <option value="Capacity">Capacity</option>
-                            <option value="SpeCapacity">Specific Capacity</option>
-                            <option value="Voltage">Voltage</option>
+                            <!-- <option value="SpeCapacity">Specific Capacity</option>
+                            <option value="Voltage">Voltage</option> -->
                             <option value="Efficiency">Efficiency</option>
                         </select>
 
@@ -88,34 +84,102 @@ include 'dbConn.php';
         </div>
         <div id="graph">
             <script>
+                var xArray = <?php echo json_encode($xArray); ?>;
+                var yArray = <?php echo json_encode($yArray); ?>;
+                var y2Array = <?php echo json_encode($y2Array); ?>;
+                var data = [];
+                var input = <?php echo json_encode($battery); ?>;
+                var color = ["black", "red", "green", "blue", "purple", "yellow"];
+                var batArray = input.split(",");
+                var y = <?php echo json_encode($yVar); ?>;
+                var y2 = <?php echo json_encode($y2Var); ?>;
+                var unitY = "";
+                var unitY2 = "";
                 var graph = document.getElementById('graph');
+                var size = xArray.length;
 
-                var trace = {
-                    x: [<?php echo $dataX; ?>],
-                    y: [<?php echo $dataY; ?>], 
-                    name : '<?php echo $yVar; ?>',
-                    type: 'scatter',
-                    line: {
-                        color: 'red',
-                        width: 2
-                    }
-                };
+                for(i=0;i<xArray.length;i++){
+                    data[i] = {
+                        x: xArray[i],
+                        y: yArray[i], 
+                        name : "Battery " + batArray[i],
+                        mode: 'markers',
+                        marker: {
+                            color: color[i],
+                            size: 2,
+                            line: {
+                            color: color[i],
+                            width: 2
+                            }
+                        }
+                    };
+                }
 
-                var trace1 = {
-                    x: [<?php echo $dataX; ?>], // the issue is coming from here since its just over laying both of them on top of each other
-                    y: [<?php echo $dataY2; ?>],
-                    name : '<?php echo $y2Var; ?>',
-                    type: 'scatter',
-                    yaxis: 'y2',
-                    line: {
-                        color: 'black',
-                        width: 2
-                    }
-                };
+                for(j=0;j<xArray.length;j++){
+                    var index = j+size;
+                    data[index] = {
+                        x: xArray[j],
+                        y: y2Array[j], 
+                        showlegend: false,
+                        // name : "Battery " + batArray[j] + "-" + y2,
+                        yaxis : 'y2',
+                        mode: 'markers',
+                        marker: {
+                            color: color[j],
+                            size: 2,
+                            line: {
+                            color: color[j],
+                            width: 2
+                            }
+                        }
+                    };
+                }
+                
+
+                // var trace = {
+                //     x: xArray[0],
+                //     y: y2Array[0],
+                //     name: 'yaxis2 data',
+                //     yaxis: 'y2',
+                //     mode: 'markers',
+                //     marker: {
+                //         color: color[2],
+                //         size: 2,
+                //         line: {
+                //         color: color[2],
+                //         width: 2
+                //         }
+                //     }
+                // };
+                // var trace2 = {
+                //     x: xArray[1],
+                //     y: y2Array[1],
+                //     name: 'yaxis2 data1',
+                //     yaxis: 'y2',
+                //     mode: 'markers',
+                //     marker: {
+                //         color: color[3],
+                //         size: 2,
+                //         line: {
+                //         color: color[3],
+                //         width: 2
+                //         }
+                //     }
+                // };
+
+                // data.push(trace);
+                // data.push(trace2);
+
+                if(y == "Capacity"){unitY += "mAh";}
+                if(y == "SpeCapacity"){unitY += "mAh/g";}
+
+                if(y2 == "Capacity"){unitY2 += "mAh";}
+                if(y2 == "Efficiency"){unitY2 += "%";}
                 
                 var layout = {
+                    havermode: false,
                     title: {
-                        text:'Data from cycles under ' + '<?php echo $cycle; ?>' + ' from battery #' + '<?php echo $battery?>',
+                        text:'Data from battery #' + '<?php echo $battery?>',
                         font: {
                             family: 'Courier New, monospace',
                             size: 24
@@ -125,7 +189,7 @@ include 'dbConn.php';
                     },
                     xaxis: {
                         title: {
-                        text: '<?php echo $xVar; ?>',
+                        text: "Cycle ID",
                         font: {
                             family: 'Courier New, monospace',
                             size: 18,
@@ -135,7 +199,7 @@ include 'dbConn.php';
                     },
                     yaxis: {
                         title: {
-                        text: '<?php echo $yVar; ?>',
+                        text: y + "(" + unitY + ")",
                         font: {
                             family: 'Courier New, monospace',
                             size: 18,
@@ -145,7 +209,7 @@ include 'dbConn.php';
                     },
                     yaxis2: {
                         title: {
-                        text: '<?php echo $y2Var; ?>',
+                        text: y2 + "(" + unitY2 + ")",
                         font: {
                             family: 'Courier New, monospace',
                             size: 18,
@@ -156,29 +220,6 @@ include 'dbConn.php';
                         side: 'right'
                     }
                 };
-
-                var data = [{
-                                x: [<?php echo $dataX; ?>],
-                                y: [<?php echo $dataY; ?>], 
-                                name : '<?php echo $yVar; ?>',
-                                type: 'scatter',
-                                line: {
-                                    color: 'red',
-                                    width: 2
-                                }
-                            },
-
-                            {
-                                x: [<?php echo $dataX; ?>], // the issue is coming from here since its just over laying both of them on top of each other
-                                y: [<?php echo $dataY2; ?>],
-                                name : '<?php echo $y2Var; ?>',
-                                type: 'scatter',
-                                yaxis: 'y2',
-                                line: {
-                                    color: 'black',
-                                    width: 2
-                                }
-                            }];
                 Plotly.newPlot(graph, data, layout);
             </script>
         </div>
